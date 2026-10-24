@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html>
+<head> <title>Chatora - Anonymous Chat</title> <style> body { font-family: sans-serif; text-align: center; margin-top: 50px; } #chat { display: none; } #messages { list-style-type: none; margin: 0; padding: 0; border: 1px solid #ccc; width: 300px; height: 300px; overflow-y: scroll; margin: auto; } #messages li { padding: 8px; border-bottom: 1px solid #eee; } </style>
+</head>
+<body> <div id="setup"> <h1>Welcome to Chatora</h1> <input type="text" id="interests" placeholder="Comma separated interests (e.g. Delhi, TikTok)"> <button onclick="startFinding()">Find Match</button> </div> <div id="chat"> <h3>Connected!</h3> <ul id="messages"></ul> <input type="text" id="messageInput"><button onclick="sendMessage()">Send</button> </div> <script src="/socket.io/socket.io.js"></script> <script> const socket = io(); let currentRoomId = null; function startFinding() { const interestsInput = document.getElementById('interests').value; const interests = interestsInput.split(',').map(item => item.trim()); socket.emit('findChat', interests); document.getElementById('setup').innerHTML = "Searching for someone with similar interests..."; } socket.on('matched', (data) => { currentRoomId = data.roomId; document.getElementById('setup').style.display = 'none'; document.getElementById('chat').style.display = 'block'; }); function sendMessage() { const input = document.getElementById('messageInput'); socket.emit('sendMessage', { roomId: currentRoomId, message: input.value }); input.value = ''; } socket.on('receiveMessage', (message) => { const li = document.createElement('li'); li.textContent = message; document.getElementById('messages').appendChild(li); }); </script>
+</body>
+</html>
+
